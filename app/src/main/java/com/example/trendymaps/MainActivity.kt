@@ -16,7 +16,8 @@ class MainActivity : AppCompatActivity() {
         val topics = intent.getStringArrayListExtra("topics")
         Log.i("hellomain", topics.toString())
         lifecycleScope.launch {
-            val url = "https://twitter.com/"
+            val url = "https://twitter.com/search?q=rest%20in%20peace"
+//            traverse every topic and before making its url enter %20 after every word instead of space
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setData(Uri.parse(url))
             startActivity(intent)
