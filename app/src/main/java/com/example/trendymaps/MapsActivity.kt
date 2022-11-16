@@ -25,12 +25,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.coroutines.CoroutineContext
 
 
 open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -38,10 +34,11 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private var markersOnMap = ArrayList<Marker>()
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private var latitude=30.740001
-    private var longitude=76.78268
+    private var latitude = 30.740001
+    private var longitude = 76.78268
     private val permissionId = 2
-    private var zoomOnMarkerLatLong: LatLng = LatLng(latitude, longitude) //default value for zooming and showing info on marker
+    private var zoomOnMarkerLatLong: LatLng =
+        LatLng(latitude, longitude) //default value for zooming and showing info on marker
 
     //setting icon as twitter icon by lazy (will come into action only when called)
     private val twitterIcon: BitmapDescriptor by lazy {
@@ -55,7 +52,7 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(binding.root)
 
         // Initiating the location service to get current location
-        fusedLocationProviderClient=LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         getLocation()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -123,9 +120,10 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val location: Location? = task.result
                     if (location != null) {
                         val geocoder = Geocoder(this, Locale.getDefault())
-                        val list: List<Address> = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        latitude=list[0].latitude
-                        longitude=list[0].longitude
+                        val list: List<Address> =
+                            geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        latitude = list[0].latitude
+                        longitude = list[0].longitude
                         val currLoc = LatLng(latitude, longitude)
                         removePreviousMarkersAndSetNewMarker(currLoc)
                         zoomOnMarkerLatLong = currLoc
@@ -141,7 +139,6 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             requestPermissions()
         }
     }
-
 
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -167,20 +164,32 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 //        operations when clicked on marker title
         mMap.setOnInfoWindowClickListener {
-            lifecycleScope.launch{
-                val response=RetrofitInstance.api.getWOEID(latitude,longitude,"Bearer AAAAAAAAAAAAAAAAAAAAAA6jiwEAAAAA7dapTtX0wawQpWxL5AcgzLhXtMw%3DjoOhKdWx1gKa7whhJLucKAGadSdPJD5nhneSsPw90VadQnnWN5")[0].woeid
-                Log.i("helloabc",response.toString())
+            lifecycleScope.launch {
+                val response = RetrofitInstance.api.getWOEID(
+                    latitude,
+                    longitude,
+                    "Bearer AAAAAAAAAAAAAAAAAAAAAA6jiwEAAAAA7dapTtX0wawQpWxL5AcgzLhXtMw%3DjoOhKdWx1gKa7whhJLucKAGadSdPJD5nhneSsPw90VadQnnWN5"
+                )[0].woeid
+                Log.i("helloabc", response.toString())
 
-                val response2=RetrofitInstance.api.getTopics(response,"Bearer AAAAAAAAAAAAAAAAAAAAAA6jiwEAAAAA7dapTtX0wawQpWxL5AcgzLhXtMw%3DjoOhKdWx1gKa7whhJLucKAGadSdPJD5nhneSsPw90VadQnnWN5")[0].trends
-                var response3= arrayListOf<String>()
-                for(i in response2)
+                val response2 = RetrofitInstance.api.getTopics(
+                    response,
+                    "Bearer AAAAAAAAAAAAAAAAAAAAAA6jiwEAAAAA7dapTtX0wawQpWxL5AcgzLhXtMw%3DjoOhKdWx1gKa7whhJLucKAGadSdPJD5nhneSsPw90VadQnnWN5"
+                )[0].trends
+                var response3 = arrayListOf<String>()
+                for (i in response2)
                     response3.add(i.name)
 //                response3 has all the trending topics extracted
-                Log.i("helloabc",response3.toString())
+                Log.i("helloabc", response3.toString())
+
+
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.putExtra("topics", response3)
+                startActivity(intent)
 
             }
-            Log.i("helloabc",zoomOnMarkerLatLong.latitude.toString())
-            Log.i("helloabc",zoomOnMarkerLatLong.longitude.toString())
+            Log.i("helloabc", zoomOnMarkerLatLong.latitude.toString())
+            Log.i("helloabc", zoomOnMarkerLatLong.longitude.toString())
         }
         if (defaultMarker != null) {
             markersOnMap.add(defaultMarker)
@@ -193,7 +202,6 @@ open class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             showArea(latLng)
         }
     }
-
 
 
     //remove previous markers and set new marker function
