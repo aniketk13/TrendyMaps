@@ -1,11 +1,15 @@
 package com.example.trendymaps
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.trendymaps.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private var adapter: RecyclerView.Adapter<TopicsViewAdapter.ViewHolder>? = null //adapter
@@ -29,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         adapter = topics?.let {
             TopicsViewAdapter(it, object : TopicsViewAdapter.ItemClickListener {
                 override fun onItemClick(topic: String, position: Int) {
+                    Log.i("hello hello", topic)
                     showTweet(topic)
                 }
             })
@@ -37,12 +42,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTweet(topic: String) {
-//        lifecycleScope.launch {
-//            val url = "https://twitter.com/search?q=rest%20in%20peace"
-////            traverse every topic and before making its url enter %20 after every word instead of space
-//            val intent = Intent(Intent.ACTION_VIEW)
-//            intent.setData(Uri.parse(url))
-//            startActivity(intent)
-//        }
+        if (topic[0] == '#') {
+            var tempTopic = topic
+            tempTopic = tempTopic.substring(1)
+            lifecycleScope.launch {
+                val url = "https://twitter.com/hashtag/$tempTopic"
+                Log.i("url", url)
+//            traverse every topic and before making its url enter %20 after every word instead of space
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(url)
+                startActivity(intent)
+            }
+        } else {
+            lifecycleScope.launch {
+                val tempUrl = formatUrl(topic)
+                Log.i("url", tempUrl)
+//            traverse every topic and before making its url enter %20 after every word instead of space
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(tempUrl)
+                startActivity(intent)
+            }
+        }
+    }
+
+    private fun formatUrl(topic: String): String {
+        var url: String = "https://twitter.com/search?q="
+        for (char in topic) {
+            if (char == ' ')
+                url = "$url%20"
+            else
+                url += char
+        }
+        return url
     }
 }
