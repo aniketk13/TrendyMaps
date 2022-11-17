@@ -60,6 +60,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
 
+    //recycler and card view
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
 }
